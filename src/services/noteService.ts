@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { type Note } from "../types/note.ts";
+import { type Note, type NoteTag } from "../types/note.ts";
 
 interface Answer {
   notes: Note[];
@@ -22,6 +22,18 @@ export async function fetchNotes(page: number) {
   return res.data;
 }
 
-export function createNote() {}
+export async function createNote(note: NoteTag) {
+  const res = await axios.post(
+    `https://notehub-public.goit.study/api/notes`,
+    note,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return res;
+}
 
 export function deleteNote() {}
