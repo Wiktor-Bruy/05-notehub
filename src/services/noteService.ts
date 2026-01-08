@@ -9,9 +9,35 @@ interface Answer {
 
 const token = import.meta.env.VITE_NOTEHUB_TOKEN;
 
-export async function fetchNotes(page: number) {
-  const res = await axios.get<Answer>(
-    `https://notehub-public.goit.study/api/notes?page=${page}&perPage=12`,
+export async function fetchNotes(page: number, topic?: string) {
+  if (topic !== "") {
+    const res = await axios.get<Answer>(
+      `https://notehub-public.goit.study/api/notes?search=${topic}&page=${page}&perPage=12`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return res.data;
+  } else {
+    const res = await axios.get<Answer>(
+      `https://notehub-public.goit.study/api/notes?page=${page}&perPage=12`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return res.data;
+  }
+}
+
+export async function createNote(note: NoteTag) {
+  const res = await axios.post<Note>(
+    `https://notehub-public.goit.study/api/notes`,
+    note,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -22,18 +48,14 @@ export async function fetchNotes(page: number) {
   return res.data;
 }
 
-export async function createNote(note: NoteTag) {
-  const res = await axios.post(
-    `https://notehub-public.goit.study/api/notes`,
-    note,
+export async function deleteNote(id: string) {
+  const res = await axios.delete(
+    `https://notehub-public.goit.study/api/notes/${id}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     }
   );
-
-  return res;
+  return res.data;
 }
-
-export function deleteNote() {}
