@@ -45,3 +45,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.button {
+  align-self: flex-end;
+  padding: 6px 12px;
+  font-size: 14px;
+  color: #fff;
+  background-color: #dc3545;
+  border-radius: 15px;
+}

@@ -14,7 +14,7 @@ export default function CreateMessage({ note, mess }: CreateMessageProps) {
       <p className={css.content}>{note.content}</p>
       <div className={css.footer}>
         <span className={css.tag}>{note.tag}</span>
-        <span className={css.tag}>{mess}</span>
+        <span className={css.button}>{mess}</span>
       </div>
     </div>
   );
