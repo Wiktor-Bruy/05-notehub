@@ -28,7 +28,7 @@ export default function Modal({ children, onClose }: ModalProps) {
       document.removeEventListener("keydown", closeModal);
       document.body.style.overflow = "";
     };
-  });
+  }, [onClose]);
 
   return createPortal(
     <div

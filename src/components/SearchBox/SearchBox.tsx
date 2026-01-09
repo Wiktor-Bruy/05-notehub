@@ -5,9 +5,10 @@ import { useDebouncedCallback } from "use-debounce";
 
 interface SearchBoxProps {
   enterWord: (word: string) => void;
+  changePage: (page: number) => void;
 }
 
-export default function SearchBox({ enterWord }: SearchBoxProps) {
+export default function SearchBox({ enterWord, changePage }: SearchBoxProps) {
   const [text, setText] = useState("");
 
   const handleChange = useDebouncedCallback(
@@ -19,7 +20,9 @@ export default function SearchBox({ enterWord }: SearchBoxProps) {
 
   useEffect(() => {
     enterWord(text);
-  }, [text, enterWord]);
+    const page = 1;
+    changePage(page);
+  }, [text, enterWord, changePage]);
 
   return (
     <input

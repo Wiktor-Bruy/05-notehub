@@ -1,6 +1,6 @@
 import css from "./App.module.css";
 
-import { type NoteTag } from "../../types/note.ts";
+import { type NoteTag, type Note } from "../../types/note.ts";
 
 import {
   keepPreviousData,
@@ -20,11 +20,18 @@ import Pagination from "../Pagination/Pagination.tsx";
 import Modal from "../Modal/Modal.tsx";
 import NoteForm from "../NoteForm/NoteForm.tsx";
 import SearchBox from "../SearchBox/SearchBox.tsx";
+import CreateMessage from "../CreateMessage/CreateMessage.tsx";
+import Error from "../Error/Error.tsx";
+
+type Modal = "form" | "error" | "create" | "delete";
 
 export default function App() {
   const [page, setPage] = useState(1);
   const [isModal, setIsModal] = useState(false);
   const [word, setWord] = useState("");
+  const [typeModal, setTypeModal] = useState<Modal>("form");
+  const [message, setMessage] = useState<Note | null>(null);
+  const [error, setError] = useState("");
 
   const queryClient = useQueryClient();
 
@@ -33,8 +40,16 @@ export default function App() {
       const res = await createNote(data);
       return res;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["note"] });
+      setIsModal(true);
+      setTypeModal("create");
+      setMessage(data);
+    },
+    onError: (error) => {
+      setIsModal(true);
+      setTypeModal("error");
+      setError(error.message);
     },
   });
 
@@ -43,8 +58,16 @@ export default function App() {
       const res = await deleteNote(id);
       return res;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["note"] });
+      setIsModal(true);
+      setTypeModal("delete");
+      setMessage(data);
+    },
+    onError: (error) => {
+      setIsModal(true);
+      setTypeModal("error");
+      setError(error.message);
     },
   });
 
@@ -71,10 +94,15 @@ export default function App() {
     setIsModal(false);
   }
 
+  function createBtn() {
+    setIsModal(true);
+    setTypeModal("form");
+  }
+
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
-        <SearchBox enterWord={setWord} />
+        <SearchBox changePage={setPage} enterWord={setWord} />
         {data && data.totalPages > 1 && (
           <Pagination
             page={page}
@@ -82,7 +110,7 @@ export default function App() {
             setPage={setPage}
           />
         )}
-        <button className={css.button} onClick={() => setIsModal(true)}>
+        <button className={css.button} onClick={createBtn}>
           Create note +
         </button>
       </header>
@@ -91,7 +119,16 @@ export default function App() {
       )}
       {isModal && (
         <Modal onClose={closeModal}>
-          <NoteForm onSubmit={handleSubmit} onCancel={cancelForm} />
+          {typeModal === "form" && (
+            <NoteForm onSubmit={handleSubmit} onCancel={cancelForm} />
+          )}
+          {typeModal === "create" && message && (
+            <CreateMessage note={message} mess="Is created" />
+          )}
+          {typeModal === "delete" && message && (
+            <CreateMessage note={message} mess="Is deleted" />
+          )}
+          {typeModal === "error" && <Error mess={error} />}
         </Modal>
       )}
     </div>

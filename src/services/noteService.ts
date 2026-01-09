@@ -49,7 +49,7 @@ export async function createNote(note: NoteTag) {
 }
 
 export async function deleteNote(id: string) {
-  const res = await axios.delete(
+  const res = await axios.delete<Note>(
     `https://notehub-public.goit.study/api/notes/${id}`,
     {
       headers: {
