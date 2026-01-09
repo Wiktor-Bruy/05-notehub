@@ -9,7 +9,10 @@ interface Answer {
 
 const token = import.meta.env.VITE_NOTEHUB_TOKEN;
 
-export async function fetchNotes(page: number, topic?: string) {
+export async function fetchNotes(
+  page: number,
+  topic?: string
+): Promise<Answer> {
   if (topic !== "") {
     const res = await axios.get<Answer>(
       `https://notehub-public.goit.study/api/notes?search=${topic}&page=${page}&perPage=12`,
