@@ -83,7 +83,7 @@ export default function NoteForm({
             name="title"
             className={css.input}
           />
-          <ErrorMessage name="title" className={css.error} />
+          <ErrorMessage name="title" component="span" className={css.error} />
         </div>
 
         <div className={css.formGroup}>
@@ -95,7 +95,7 @@ export default function NoteForm({
             className={css.textarea}
             rows={8}
           />
-          <ErrorMessage name="content" className={css.error} />
+          <ErrorMessage name="content" component="span" className={css.error} />
         </div>
 
         <div className={css.formGroup}>
@@ -107,7 +107,7 @@ export default function NoteForm({
             <option value="Meeting">Meeting</option>
             <option value="Shopping">Shopping</option>
           </Field>
-          <ErrorMessage name="tag" className={css.error} />
+          <ErrorMessage name="tag" component="span" className={css.error} />
         </div>
 
         <div className={css.actions}>
