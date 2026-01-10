@@ -20,7 +20,7 @@ export default function SearchBox({ changeWord }: SearchBoxProps) {
   return (
     <input
       onChange={handleChange}
-      defaultValue={text}
+      value={text}
       className={css.input}
       type="text"
       placeholder="Search notes"

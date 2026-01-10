@@ -60,9 +60,12 @@ export default function NoteForm({
       .max(50, "Max length 50 simbols.")
       .required("This field is required"),
     content: Yup.string().max(500, "Max length 500 simbols."),
-    tag: Yup.string<
-      "Todo" | "Work" | "Personal" | "Meeting" | "Shopping"
-    >().required("This field is required"),
+    tag: Yup.string()
+      .required("This field is required")
+      .oneOf(
+        ["Todo", "Work", "Personal", "Meeting", "Shopping"],
+        "Invalid tag."
+      ),
   });
 
   return (
