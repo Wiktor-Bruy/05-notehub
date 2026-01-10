@@ -1,12 +1,16 @@
+type TagNote = "Todo" | "Work" | "Personal" | "Meeting" | "Shopping";
+
 export interface Note {
   content: string;
   id: string;
-  tag: "Todo" | "Work" | "Personal" | "Meeting" | "Shopping";
+  tag: TagNote;
   title: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface NoteTag {
+export interface NewNote {
   title: string;
   content: string;
-  tag: "Todo" | "Work" | "Personal" | "Meeting" | "Shopping";
+  tag: TagNote;
 }

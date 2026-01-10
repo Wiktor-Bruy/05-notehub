@@ -1,6 +1,6 @@
 import axios from "axios";
 
-import { type Note, type NoteTag } from "../types/note.ts";
+import { type Note, type NewNote } from "../types/note.ts";
 
 interface Answer {
   notes: Note[];
@@ -22,6 +22,7 @@ export async function fetchNotes(
         },
       }
     );
+
     return res.data;
   } else {
     const res = await axios.get<Answer>(
@@ -32,12 +33,11 @@ export async function fetchNotes(
         },
       }
     );
-
     return res.data;
   }
 }
 
-export async function createNote(note: NoteTag) {
+export async function createNote(note: NewNote): Promise<Note> {
   const res = await axios.post<Note>(
     `https://notehub-public.goit.study/api/notes`,
     note,
@@ -51,7 +51,7 @@ export async function createNote(note: NoteTag) {
   return res.data;
 }
 
-export async function deleteNote(id: string) {
+export async function deleteNote(id: string): Promise<Note> {
   const res = await axios.delete<Note>(
     `https://notehub-public.goit.study/api/notes/${id}`,
     {

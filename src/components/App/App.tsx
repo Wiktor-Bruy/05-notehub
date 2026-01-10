@@ -1,19 +1,11 @@
 import css from "./App.module.css";
 
-import { type NoteTag, type Note } from "../../types/note.ts";
+import { type Note } from "../../types/note.ts";
 
-import {
-  keepPreviousData,
-  useQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import {
-  fetchNotes,
-  createNote,
-  deleteNote,
-} from "../../services/noteService.ts";
+import { fetchNotes } from "../../services/noteService.ts";
+import { useDebouncedCallback } from "use-debounce";
 
 import NoteList from "../NoteList/NoteList.tsx";
 import Pagination from "../Pagination/Pagination.tsx";
@@ -33,44 +25,6 @@ export default function App() {
   const [message, setMessage] = useState<Note | null>(null);
   const [error, setError] = useState("");
 
-  const queryClient = useQueryClient();
-
-  const createMutation = useMutation({
-    mutationFn: async (data: NoteTag) => {
-      const res = await createNote(data);
-      return res;
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["note"] });
-      setIsModal(true);
-      setTypeModal("create");
-      setMessage(data);
-    },
-    onError: (error) => {
-      setIsModal(true);
-      setTypeModal("error");
-      setError(error.message);
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const res = await deleteNote(id);
-      return res;
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["note"] });
-      setIsModal(true);
-      setTypeModal("delete");
-      setMessage(data);
-    },
-    onError: (error) => {
-      setIsModal(true);
-      setTypeModal("error");
-      setError(error.message);
-    },
-  });
-
   const { data } = useQuery({
     queryKey: ["note", page, word],
     queryFn: () => fetchNotes(page, word),
@@ -79,15 +33,6 @@ export default function App() {
 
   function closeModal() {
     setIsModal(false);
-  }
-
-  function handleSubmit(content: NoteTag) {
-    setIsModal(false);
-    createMutation.mutate(content);
-  }
-
-  function deledeNot(id: string) {
-    deleteMutation.mutate(id);
   }
 
   function cancelForm() {
@@ -99,10 +44,16 @@ export default function App() {
     setTypeModal("form");
   }
 
+  const changeWord = useDebouncedCallback((newWord: string) => {
+    const page = 1;
+    setPage(page);
+    setWord(newWord);
+  }, 500);
+
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
-        <SearchBox changePage={setPage} enterWord={setWord} />
+        <SearchBox changeWord={changeWord} />
         {data && data.totalPages > 1 && (
           <Pagination
             page={page}
@@ -115,12 +66,24 @@ export default function App() {
         </button>
       </header>
       {data && data.notes.length > 0 && (
-        <NoteList onDelete={deledeNot} noteList={data.notes} />
+        <NoteList
+          setError={setError}
+          setIsModal={setIsModal}
+          setMessage={setMessage}
+          setTypeModal={setTypeModal}
+          noteList={data.notes}
+        />
       )}
       {isModal && (
         <Modal onClose={closeModal}>
           {typeModal === "form" && (
-            <NoteForm onSubmit={handleSubmit} onCancel={cancelForm} />
+            <NoteForm
+              setError={setError}
+              setIsModal={setIsModal}
+              setMessage={setMessage}
+              setTypeModal={setTypeModal}
+              onCancel={cancelForm}
+            />
           )}
           {typeModal === "create" && message && (
             <CreateMessage note={message} mess="Is created" />

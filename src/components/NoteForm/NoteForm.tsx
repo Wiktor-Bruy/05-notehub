@@ -2,25 +2,55 @@ import css from "./NoteForm.module.css";
 
 import { ErrorMessage, Field, Form, Formik, type FormikHelpers } from "formik";
 import { useId } from "react";
-import { type NoteTag } from "../../types/note.ts";
+import { type NewNote, type Note } from "../../types/note.ts";
 import * as Yup from "yup";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createNote } from "../../services/noteService.ts";
 
 interface NoteFormProps {
-  onSubmit: (content: NoteTag) => void;
   onCancel: () => void;
+  setIsModal: (type: boolean) => void;
+  setTypeModal: (type: "form" | "error" | "create" | "delete") => void;
+  setMessage: (mes: Note) => void;
+  setError: (er: string) => void;
 }
 
-export default function NoteForm({ onSubmit, onCancel }: NoteFormProps) {
+export default function NoteForm({
+  onCancel,
+  setError,
+  setIsModal,
+  setMessage,
+  setTypeModal,
+}: NoteFormProps) {
   const id = useId();
+  const queryClient = useQueryClient();
 
-  const initVal: NoteTag = {
+  const createMutation = useMutation({
+    mutationFn: async (data: NewNote) => {
+      const res = await createNote(data);
+      return res;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["note"] });
+      setIsModal(true);
+      setTypeModal("create");
+      setMessage(data);
+    },
+    onError: (error) => {
+      setIsModal(true);
+      setTypeModal("error");
+      setError(error.message);
+    },
+  });
+
+  const initVal: NewNote = {
     title: "",
     content: "",
     tag: "Todo",
   };
 
-  function handleSubmit(values: NoteTag, actions: FormikHelpers<NoteTag>) {
-    onSubmit(values);
+  function handleSubmit(values: NewNote, actions: FormikHelpers<NewNote>) {
+    createMutation.mutate(values);
     actions.resetForm();
   }
 

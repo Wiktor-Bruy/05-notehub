@@ -1,28 +1,21 @@
-import { useEffect, useState } from "react";
 import css from "./SearchBox.module.css";
 
-import { useDebouncedCallback } from "use-debounce";
+import { useEffect, useState } from "react";
 
 interface SearchBoxProps {
-  enterWord: (word: string) => void;
-  changePage: (page: number) => void;
+  changeWord: (word: string) => void;
 }
 
-export default function SearchBox({ enterWord, changePage }: SearchBoxProps) {
+export default function SearchBox({ changeWord }: SearchBoxProps) {
   const [text, setText] = useState("");
 
-  const handleChange = useDebouncedCallback(
-    (ev: React.ChangeEvent<HTMLInputElement>) => {
-      setText(ev.target.value);
-    },
-    500
-  );
+  function handleChange(ev: React.ChangeEvent<HTMLInputElement>) {
+    setText(ev.target.value);
+  }
 
   useEffect(() => {
-    enterWord(text);
-    const page = 1;
-    changePage(page);
-  }, [text, enterWord, changePage]);
+    changeWord(text);
+  }, [text, changeWord]);
 
   return (
     <input
